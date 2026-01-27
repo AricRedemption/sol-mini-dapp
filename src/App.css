@@ -4,12 +4,12 @@
   --bg-secondary: #1e293b;
   --bg-card: rgba(30, 41, 59, 0.7);
   --bg-glass: rgba(15, 23, 42, 0.8);
-  
+
   /* Text Colors */
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
-  
+
   /* Accents */
   --accent-primary: #3b82f6;
   --accent-secondary: #8b5cf6;
@@ -17,15 +17,17 @@
   --success: #10b981;
   --error: #ef4444;
   --warning: #f59e0b;
-  
+
   /* UI Elements */
   --border-color: rgba(148, 163, 184, 0.1);
   --border-hover: rgba(148, 163, 184, 0.2);
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
-  
+
   /* Dimensions */
   --radius-xl: 24px;
   --radius-lg: 16px;
@@ -37,15 +39,23 @@
 
 /* Background Effect */
 body::before {
-  content: '';
+  content: "";
   position: fixed;
   top: -20%;
   left: -20%;
   width: 140%;
   height: 140%;
-  background: 
-    radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15), transparent 50%),
-    radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.15), transparent 50%);
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(59, 130, 246, 0.15),
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 50%,
+      rgba(139, 92, 246, 0.15),
+      transparent 50%
+    );
   z-index: -1;
   pointer-events: none;
 }
@@ -178,13 +188,17 @@ body::before {
 }
 
 .balance-card::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   right: 0;
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.1), transparent 70%);
+  background: radial-gradient(
+    circle at 100% 0%,
+    rgba(59, 130, 246, 0.1),
+    transparent 70%
+  );
   pointer-events: none;
 }
 
@@ -320,7 +334,7 @@ body::before {
 .token-amount {
   font-size: 14px;
   color: var(--text-secondary);
-  font-family: 'Roboto Mono', monospace; /* Monospace for numbers alignment */
+  font-family: "Roboto Mono", monospace; /* Monospace for numbers alignment */
 }
 
 /* Loading State */
@@ -343,7 +357,9 @@ body::before {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Empty State */
@@ -365,7 +381,7 @@ body::before {
 /* Wallet Adapter Customization & Modal Optimization */
 .wallet-adapter-button {
   background-color: var(--accent-primary) !important;
-  font-family: 'Inter', sans-serif !important;
+  font-family: "Inter", sans-serif !important;
   font-weight: 600 !important;
   height: 40px !important;
   border-radius: var(--radius-md) !important;
@@ -386,30 +402,38 @@ body::before {
   border: 1px solid var(--border-color) !important;
   border-radius: var(--radius-xl) !important;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
-  max-width: 360px !important;
+  max-width: 440px !important; /* Increased again to give more room for single line */
+  width: 95vw !important;
 }
 
 /* Modal Title */
 .wallet-adapter-modal-title {
   color: var(--text-primary) !important;
-  font-family: 'Inter', sans-serif !important;
+  font-family: "Inter", sans-serif !important;
   font-weight: 700 !important;
-  font-size: 20px !important;
-  padding: 24px 24px 12px 24px !important;
-  text-align: center !important;
+  font-size: 16px !important; /* Slightly smaller font to ensure it fits */
+  padding: 32px 48px 16px 24px !important;
+  text-align: left !important;
+  width: calc(100% - 40px) !important;
+  white-space: normal !important; /* Allow wrapping if absolutely necessary, but font-size helps stay single line */
+  overflow: visible !important;
+  text-overflow: clip !important;
+  line-height: 1.2 !important;
 }
 
 /* Modal Close Button */
 .wallet-adapter-modal-button-close {
   background: rgba(255, 255, 255, 0.05) !important;
   border-radius: 50% !important;
-  top: 16px !important;
+  top: 24px !important;
   right: 16px !important;
   width: 32px !important;
   height: 32px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  padding: 0 !important;
+  z-index: 100 !important;
 }
 
 .wallet-adapter-modal-button-close:hover {
@@ -418,7 +442,9 @@ body::before {
 
 .wallet-adapter-modal-button-close svg {
   fill: var(--text-secondary) !important;
-  transform: scale(0.8) !important;
+  width: 14px !important;
+  height: 14px !important;
+  opacity: 0.8 !important;
 }
 
 /* Modal List */
@@ -453,12 +479,11 @@ body::before {
   margin-left: 12px !important;
 }
 
-.wallet-adapter-modal-list .wallet-adapter-button-end-icon,
-.wallet-adapter-modal-list .wallet-adapter-button-start-icon,
 .wallet-adapter-modal-list .wallet-adapter-button-end-icon img,
 .wallet-adapter-modal-list .wallet-adapter-button-start-icon img {
-  width: 28px !important;
-  height: 28px !important;
+  width: 32px !important;
+  height: 32px !important;
+  object-fit: contain !important;
 }
 
 /* Detected Badge */
@@ -503,12 +528,12 @@ body::before {
     width: 40px;
     height: 40px;
   }
-  
+
   /* Hide token name on very small screens if needed */
   .token-name {
     display: none;
   }
-  
+
   @media (min-width: 380px) {
     .token-name {
       display: block;
