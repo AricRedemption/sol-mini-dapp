@@ -6,6 +6,8 @@ import {
 import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
+  CoinbaseWalletAdapter,
+  TrustWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -44,7 +46,12 @@ function App() {
   const endpoint = useMemo(() => getRpcEndpoint(), []);
 
   const wallets = useMemo(
-    () => [new PhantomWalletAdapter(), new SolflareWalletAdapter()],
+    () => [
+      new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
+      new CoinbaseWalletAdapter(),
+      new TrustWalletAdapter(),
+    ],
     [],
   );
 
