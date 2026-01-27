@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
+import type { WalletError } from "@solana/wallet-adapter-base";
 import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
@@ -55,9 +56,14 @@ function App() {
     [],
   );
 
+  const onError = useCallback((error: WalletError) => {
+    console.error("[Wallet Error]", error.message);
+    localStorage.removeItem("walletName");
+  }, []);
+
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
+      <WalletProvider wallets={wallets} onError={onError} autoConnect>
         <WalletModalProvider>
           <div className="app-layout">
             <Header />
