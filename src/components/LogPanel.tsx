@@ -77,7 +77,7 @@ export function LogPanel() {
         </button>
         <div className="log-panel-actions">
           <button type="button" className="log-panel-btn" onClick={handleCopy}>
-            {copied ? "\u2713" : "Copy"}
+            {copied ? "\u2713" : "\u29c9"}
           </button>
           <button type="button" className="log-panel-btn" onClick={handleClear}>
             Clear
