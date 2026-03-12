@@ -51,6 +51,9 @@ export function usePortfolio() {
           programId: TOKEN_PROGRAM_ID,
         }),
       ]);
+      logDiag(
+        `assets: fetch raw wallet=${maskAddress(walletAddress)} fp=${walletFingerprint} lamports=${solLamports} tokenAccounts=${tokenAccounts.value.length}`,
+      );
 
       const solVal = solLamports / LAMPORTS_PER_SOL;
       setSolBalance(solVal);
@@ -75,6 +78,9 @@ export function usePortfolio() {
       });
 
       const metadataMap = await fetchTokenMetadataBatch(activeMints);
+      logDiag(
+        `assets: metadata loaded wallet=${maskAddress(walletAddress)} fp=${walletFingerprint} mints=${activeMints.length}`,
+      );
 
       const solMetadata = metadataMap.get(SOL_MINT);
       const solPrice = solMetadata?.price || 0;
@@ -120,7 +126,7 @@ export function usePortfolio() {
       setAssets(filteredSortedAssets);
       setTotalBalance(calculatedTotal);
       logDiag(
-        `assets: fetch success wallet=${maskAddress(walletAddress)} fp=${walletFingerprint} assets=${filteredSortedAssets.length}`,
+        `assets: fetch success wallet=${maskAddress(walletAddress)} fp=${walletFingerprint} assets=${filteredSortedAssets.length} totalUsd=${calculatedTotal.toFixed(6)}`,
       );
     } catch (err) {
       handleError(err);

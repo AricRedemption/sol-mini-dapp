@@ -24,6 +24,7 @@ import { LogPanel } from "./components/LogPanel";
 import { usePortfolio } from "./hooks/usePortfolio";
 import { getRpcEndpoint } from "./services/helius";
 import { logDiag, addressFingerprint, maskAddress } from "./lib/logger";
+import { logWalletStandardSnapshot } from "./lib/solanaWalletStandardProbe";
 
 // Styles
 import "@solana/wallet-adapter-react-ui/styles.css";
@@ -33,6 +34,9 @@ function WalletDashboard() {
   const { connected, connecting, disconnecting, wallet, publicKey } = useWallet();
   const { assets, totalBalance, loading, error } = usePortfolio();
   const previousStateRef = useRef<string>("");
+  const previousConnectedRef = useRef<boolean>(false);
+  const previousConnectingRef = useRef<boolean>(false);
+  const previousAddressRef = useRef<string | null>(null);
 
   useEffect(() => {
     const address = publicKey?.toBase58() ?? null;
@@ -50,6 +54,32 @@ function WalletDashboard() {
     previousStateRef.current = state;
     logDiag(`sol: wallet-state ${state}`);
   }, [connected, connecting, disconnecting, wallet, publicKey]);
+
+  useEffect(() => {
+    const currentAddress = publicKey?.toBase58() ?? null;
+    const previousAddress = previousAddressRef.current;
+    if (previousAddress !== currentAddress) {
+      logDiag(
+        `sol: address-change old=${maskAddress(previousAddress)} oldFp=${addressFingerprint(previousAddress)} new=${maskAddress(currentAddress)} newFp=${addressFingerprint(currentAddress)}`,
+      );
+      previousAddressRef.current = currentAddress;
+    }
+
+    if (!previousConnectingRef.current && connecting) {
+      logDiag(`sol: connect-phase start adapter=${wallet?.adapter.name ?? "none"}`);
+      logWalletStandardSnapshot("connecting_start", wallet?.adapter.name ?? null);
+    }
+    previousConnectingRef.current = connecting;
+
+    if (!previousConnectedRef.current && connected) {
+      logDiag(`sol: connect-phase connected adapter=${wallet?.adapter.name ?? "none"}`);
+      logWalletStandardSnapshot("connected", wallet?.adapter.name ?? null);
+    } else if (previousConnectedRef.current && !connected) {
+      logDiag("sol: connect-phase disconnected");
+      logWalletStandardSnapshot("disconnected", wallet?.adapter.name ?? null);
+    }
+    previousConnectedRef.current = connected;
+  }, [connected, connecting, wallet, publicKey]);
 
   if (!connected) {
     return <ConnectPrompt />;
@@ -83,7 +113,12 @@ function App() {
 
   useEffect(() => {
     const walletNames = wallets.map((wallet) => wallet.name).join(", ");
-    logDiag(`sol: bootstrap endpoint=${endpoint} wallets=${walletNames}`);
+    const persistedWalletName =
+      typeof window !== "undefined" ? window.localStorage.getItem("walletName") || "none" : "none";
+    logDiag(
+      `sol: bootstrap endpoint=${endpoint} wallets=${walletNames} autoConnect=true persistedWallet=${persistedWalletName}`,
+    );
+    logWalletStandardSnapshot("bootstrap", null);
   }, [endpoint, wallets]);
 
   return (
