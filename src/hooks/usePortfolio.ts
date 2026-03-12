@@ -5,6 +5,7 @@ import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import type { Asset } from "../types";
 import { fetchTokenMetadataBatch } from "../services/helius";
 import { SOL_MINT, SOL_LOGO_URI, REFRESH_DEBOUNCE_MS } from "../constants";
+import { logDiag, addressFingerprint, maskAddress } from "../lib/logger";
 
 export function usePortfolio() {
   const { connection } = useConnection();
@@ -19,8 +20,8 @@ export function usePortfolio() {
   const lastFetchedWallet = useRef<string | null>(null);
 
   const handleError = useCallback((err: unknown) => {
-    console.error("Portfolio fetch failed:", err);
     const message = err instanceof Error ? err.message : "";
+    logDiag(`assets: fetch failed message="${message || "unknown"}"`);
     if (message.includes("429")) {
       setError("Rate limit exceeded. Please try again later.");
     } else {
@@ -29,7 +30,16 @@ export function usePortfolio() {
   }, []);
 
   const fetchBalances = useCallback(async () => {
-    if (!publicKey) return;
+    if (!publicKey) {
+      logDiag("assets: skip fetch because wallet is disconnected");
+      return;
+    }
+
+    const walletAddress = publicKey.toBase58();
+    const walletFingerprint = addressFingerprint(walletAddress);
+    logDiag(
+      `assets: fetch start wallet=${maskAddress(walletAddress)} fp=${walletFingerprint}`,
+    );
 
     setLoading(true);
     setError(null);
@@ -109,6 +119,9 @@ export function usePortfolio() {
 
       setAssets(filteredSortedAssets);
       setTotalBalance(calculatedTotal);
+      logDiag(
+        `assets: fetch success wallet=${maskAddress(walletAddress)} fp=${walletFingerprint} assets=${filteredSortedAssets.length}`,
+      );
     } catch (err) {
       handleError(err);
     } finally {
@@ -118,6 +131,7 @@ export function usePortfolio() {
 
   useEffect(() => {
     if (!publicKey) {
+      logDiag("assets: wallet cleared");
       setAssets([]);
       setSolBalance(0);
       setTotalBalance(0);
@@ -127,12 +141,20 @@ export function usePortfolio() {
     }
 
     const walletAddress = publicKey.toBase58();
-    if (lastFetchedWallet.current === walletAddress) return;
+    if (lastFetchedWallet.current === walletAddress) {
+      logDiag(
+        `assets: skip fetch duplicate wallet=${maskAddress(walletAddress)} fp=${addressFingerprint(walletAddress)}`,
+      );
+      return;
+    }
 
     lastFetchedWallet.current = walletAddress;
     fetchBalances();
 
     const subscriptionId = connection.onAccountChange(publicKey, () => {
+      logDiag(
+        `assets: account change detected wallet=${maskAddress(walletAddress)} fp=${addressFingerprint(walletAddress)}`,
+      );
       setTimeout(() => {
         lastFetchedWallet.current = null;
         fetchBalances();

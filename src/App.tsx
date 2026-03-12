@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useEffect, useRef } from "react";
 import {
   ConnectionProvider,
   WalletProvider,
@@ -22,14 +22,33 @@ import { AssetList } from "./components/AssetList";
 // Hooks & Services
 import { usePortfolio } from "./hooks/usePortfolio";
 import { getRpcEndpoint } from "./services/helius";
+import { logDiag, addressFingerprint, maskAddress } from "./lib/logger";
 
 // Styles
 import "@solana/wallet-adapter-react-ui/styles.css";
 import "./App.css";
 
 function WalletDashboard() {
-  const { connected } = useWallet();
+  const { connected, connecting, disconnecting, wallet, publicKey } = useWallet();
   const { assets, totalBalance, loading, error } = usePortfolio();
+  const previousStateRef = useRef<string>("");
+
+  useEffect(() => {
+    const address = publicKey?.toBase58() ?? null;
+    const adapterName = wallet?.adapter.name ?? "none";
+    const state = [
+      `connected=${connected}`,
+      `connecting=${connecting}`,
+      `disconnecting=${disconnecting}`,
+      `adapter=${adapterName}`,
+      `address=${maskAddress(address)}`,
+      `fp=${addressFingerprint(address)}`,
+    ].join(" ");
+
+    if (previousStateRef.current === state) return;
+    previousStateRef.current = state;
+    logDiag(`sol: wallet-state ${state}`);
+  }, [connected, connecting, disconnecting, wallet, publicKey]);
 
   if (!connected) {
     return <ConnectPrompt />;
@@ -57,9 +76,14 @@ function App() {
   );
 
   const onError = useCallback((error: WalletError) => {
-    console.error("[Wallet Error]", error.message);
+    logDiag(`sol: wallet-error message="${error.message}"`);
     localStorage.removeItem("walletName");
   }, []);
+
+  useEffect(() => {
+    const walletNames = wallets.map((wallet) => wallet.name).join(", ");
+    logDiag(`sol: bootstrap endpoint=${endpoint} wallets=${walletNames}`);
+  }, [endpoint, wallets]);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
