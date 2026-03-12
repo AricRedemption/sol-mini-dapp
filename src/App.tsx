@@ -18,6 +18,7 @@ import { Header } from "./components/Header";
 import { ConnectPrompt } from "./components/ConnectPrompt";
 import { BalanceCard } from "./components/BalanceCard";
 import { AssetList } from "./components/AssetList";
+import { LogPanel } from "./components/LogPanel";
 
 // Hooks & Services
 import { usePortfolio } from "./hooks/usePortfolio";
@@ -94,6 +95,7 @@ function App() {
             <main className="main-content">
               <WalletDashboard />
             </main>
+            <LogPanel />
           </div>
         </WalletModalProvider>
       </WalletProvider>

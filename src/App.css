@@ -491,6 +491,78 @@ body::before {
   display: none; /* Hide default 'Detected' if it's text based or style it */
 }
 
+/* Logs Panel */
+.log-panel {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: min(680px, calc(100vw - 32px));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: rgba(2, 6, 23, 0.95);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(8px);
+  z-index: 120;
+}
+
+.log-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.log-panel-toggle {
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.log-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.log-panel-btn {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: rgba(30, 41, 59, 0.85);
+  color: var(--text-primary);
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.log-panel-btn:hover {
+  border-color: var(--border-hover);
+}
+
+.log-panel-body {
+  max-height: 240px;
+  overflow: auto;
+  padding: 10px 12px 12px;
+}
+
+.log-panel-line {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #e2e8f0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.log-panel-empty {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
 /* Mobile Optimizations */
 @media (max-width: 768px) {
   :root {
@@ -538,5 +610,12 @@ body::before {
     .token-name {
       display: block;
     }
+  }
+
+  .log-panel {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
   }
 }

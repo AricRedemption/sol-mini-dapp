@@ -1,4 +1,7 @@
 const LOG_PREFIX = "\u25c6";
+const MAX_LOG_ENTRIES = 500;
+const logEntries: string[] = [];
+const subscribers = new Set<(entry: string) => void>();
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -22,6 +25,28 @@ export function addressFingerprint(address: string | null | undefined): string {
 
 export function logDiag(message: string): void {
   // Keep the same style as Monvio diagnostics for side-by-side comparison.
-  console.info(`[${nowIso()}] ${LOG_PREFIX} ${message}`);
+  const entry = `[${nowIso()}] ${LOG_PREFIX} ${message}`;
+  logEntries.push(entry);
+  if (logEntries.length > MAX_LOG_ENTRIES) {
+    logEntries.splice(0, logEntries.length - MAX_LOG_ENTRIES);
+  }
+  for (const notify of subscribers) {
+    notify(entry);
+  }
+  console.info(entry);
 }
 
+export function getDiagLogs(): string[] {
+  return [...logEntries];
+}
+
+export function clearDiagLogs(): void {
+  logEntries.length = 0;
+}
+
+export function subscribeDiagLogs(handler: (entry: string) => void): () => void {
+  subscribers.add(handler);
+  return () => {
+    subscribers.delete(handler);
+  };
+}
