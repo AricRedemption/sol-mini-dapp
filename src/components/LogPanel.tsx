@@ -20,6 +20,7 @@ export function LogPanel() {
   const [collapsed, setCollapsed] = useState(false);
   const [copied, setCopied] = useState(false);
   const bodyRef = useRef<HTMLDivElement | null>(null);
+  const copiedResetTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     return subscribeDiagLogs((entry) => {
@@ -48,7 +49,13 @@ export function LogPanel() {
     setCopied(ok);
     if (ok) {
       logDiag(`diag: panel copied lines=${logs.length}`);
-      setTimeout(() => setCopied(false), 1500);
+      if (copiedResetTimerRef.current !== null) {
+        window.clearTimeout(copiedResetTimerRef.current);
+      }
+      copiedResetTimerRef.current = window.setTimeout(() => {
+        setCopied(false);
+        copiedResetTimerRef.current = null;
+      }, 3000);
     }
   };
 
@@ -70,7 +77,7 @@ export function LogPanel() {
         </button>
         <div className="log-panel-actions">
           <button type="button" className="log-panel-btn" onClick={handleCopy}>
-            {copied ? "Copied" : "Copy"}
+            {copied ? "\u2713" : "Copy"}
           </button>
           <button type="button" className="log-panel-btn" onClick={handleClear}>
             Clear
@@ -93,4 +100,3 @@ export function LogPanel() {
     </section>
   );
 }
-
